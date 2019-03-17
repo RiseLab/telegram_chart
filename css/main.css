@@ -1,0 +1,58 @@
+html, body {
+    /*   margin: 0; */
+    /*   padding: 0; */
+}
+
+canvas {
+
+}
+.graph {
+    border: 1px solid lightgray;
+    height: 600px;
+    position: relative;
+    width: 800px;
+}
+.grid-mask {
+    background: linear-gradient(to right, white 50px, transparent 100px, transparent calc(100% - 100px) , white calc(100% - 50px));
+    bottom: 120px;
+    height: 59px;
+    position: absolute;
+    width: 100%;
+}
+.graph-navi {
+    bottom: 0;
+    display: flex;
+    height: 120px;
+    left: 0;
+    position: absolute;
+    width: 100%;
+}
+.graph-navi__rmask {
+    background: linear-gradient(rgba(173, 216, 230, 0.3) 0, rgba(173, 216, 230, 0.3) 100%), linear-gradient(rgba(255, 255, 255, 0.9) 0, rgba(255, 255, 255, 0.9) 100%);
+    width: 0;
+}
+.graph-navi__lmask {
+    background: linear-gradient(rgba(173, 216, 230, 0.3) 0, rgba(173, 216, 230, 0.3) 100%), linear-gradient(rgba(255, 255, 255, 0.8) 0, rgba(255, 255, 255, 0.8) 100%);
+    width: 640px;
+}
+.graph-navi__lctrl, .graph-navi__rctrl {
+    background-color: rgba(173, 216, 230, 0.8);
+    cursor: ew-resize;
+    width: 10px;
+}
+.graph-navi__lctrl:hover, .graph-navi__rctrl:hover {
+    background-color: rgba(173, 216, 230, 0.9);
+}
+.graph-navi__win {
+    border-color: rgba(173, 216, 230, 0.7);
+    border-style: solid;
+    border-width: 2px 0;
+    cursor: move;
+    display: flex;
+    justify-content: space-between;
+    width: 140px;
+}
+.graph-navi__win:hover {
+    /*   background: radial-gradient(circle, rgba(173, 216, 230, 0.7) 20px, transparent 21px); */
+    /*   cursor: pointer; */
+}
