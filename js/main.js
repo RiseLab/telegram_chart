@@ -35,49 +35,51 @@ class KeiChart {
             naviWinWidth = this.settings.ctrl.winWidth,
             naviLmaskWidth = this.settings.width - this.settings.ctrl.winWidth - 20,
             naviRmaskWidth = 0,
-            pageX = 0,
-            self = this;
+            pageX = 0;
 
-        let lCtrlMove = function (e) {
-                let pageXChange = pageX - e.pageX;
+        let lCtrlMove = (e) => {
+                let pageXChange = pageX - (e.pageX || e.touches[0].pageX);
                 if ((naviWinWidth + pageXChange >= 100) && (naviLmaskWidth - pageXChange >= 0)) {
                     naviWin.style.width = naviWinWidth + pageXChange + 'px';
                     naviLmask.style.width = naviLmaskWidth - pageXChange + 'px';
 
-                    self.renderMain(
-                        Math.floor((naviLmaskWidth - pageXChange) /  self.settings.ctrl.xMult),
-                        Math.floor(naviRmaskWidth /  self.settings.ctrl.xMult)
+                    this.renderMain(
+                        Math.floor((naviLmaskWidth - pageXChange) /  this.settings.ctrl.xMult),
+                        Math.floor(naviRmaskWidth /  this.settings.ctrl.xMult)
                     );
                 }
             },
-            rCtrlMove = function (e) {
-                let pageXChange = pageX - e.pageX;
+            rCtrlMove = (e) => {
+                let pageXChange = pageX - (e.pageX || e.touches[0].pageX);
                 if ((naviWinWidth - pageXChange >= 100) && (naviRmaskWidth + pageXChange >= 0)) {
                     naviWin.style.width = naviWinWidth - pageXChange + 'px';
                     naviRmask.style.width = naviRmaskWidth + pageXChange + 'px';
 
-                    self.renderMain(
-                        Math.floor(naviLmaskWidth /  self.settings.ctrl.xMult),
-                        Math.floor((naviRmaskWidth + pageXChange) / self.settings.ctrl.xMult)
+                    this.renderMain(
+                        Math.floor(naviLmaskWidth /  this.settings.ctrl.xMult),
+                        Math.floor((naviRmaskWidth + pageXChange) / this.settings.ctrl.xMult)
                     );
                 }
             },
-            winMove = function (e) {
-                let pageXChange = pageX - e.pageX;
+            winMove = (e) => {
+                let pageXChange = pageX - (e.pageX || e.touches[0].pageX);
                 if ((naviLmaskWidth - pageXChange >= 0) && (naviRmaskWidth + pageXChange >= 0)) {
                     naviLmask.style.width = (naviLmaskWidth - pageXChange) + 'px';
                     naviRmask.style.width = (naviRmaskWidth + pageXChange) + 'px';
 
-                    self.renderMain(
-                        Math.floor((naviLmaskWidth - pageXChange) /  self.settings.ctrl.xMult),
-                        Math.floor((naviRmaskWidth + pageXChange) / self.settings.ctrl.xMult)
+                    this.renderMain(
+                        Math.floor((naviLmaskWidth - pageXChange) /  this.settings.ctrl.xMult),
+                        Math.floor((naviRmaskWidth + pageXChange) / this.settings.ctrl.xMult)
                     );
                 }
             },
             ctrlStop = function (e) {
                 window.removeEventListener('mousemove', lCtrlMove);
+                window.removeEventListener('touchmove', lCtrlMove);
                 window.removeEventListener('mousemove', rCtrlMove);
+                window.removeEventListener('touchmove', rCtrlMove);
                 window.removeEventListener('mousemove', winMove);
+                window.removeEventListener('touchmove', winMove);
                 naviWinWidth = naviWin.clientWidth;
                 naviLmaskWidth = naviLmask.clientWidth;
                 naviRmaskWidth = naviRmask.clientWidth;
@@ -87,7 +89,7 @@ class KeiChart {
         this.settings.gData = options.data;
 
         if (options.data.columns) {
-            options.data.columns.forEach(function (item) {
+            options.data.columns.forEach((item) => {
                 if (item[0] !== 'x') {
                     let label = document.createElement('label'),
                         input = document.createElement('input'),
@@ -103,26 +105,27 @@ class KeiChart {
                     input.type = 'checkbox';
                     input.value = item[0];
                     input.checked = true;
-                    input.addEventListener('change', function (e) {
-                        if (this.closest('.kei-chart__buttons').querySelectorAll('input:checked').length === 1) {
-                            this.closest('.kei-chart__buttons').querySelector('input:checked').disabled = true;
+                    input.addEventListener('change', (e) => {
+                        let checkbox = e.target;
+                        if (checkbox.closest('.kei-chart__buttons').querySelectorAll('input:checked').length === 1) {
+                            checkbox.closest('.kei-chart__buttons').querySelector('input:checked').disabled = true;
                         } else {
-                            this.closest('.kei-chart__buttons').querySelectorAll('input:checked').forEach(item => {
+                            checkbox.closest('.kei-chart__buttons').querySelectorAll('input:checked').forEach(item => {
                                 item.disabled = false;
                             });
                         }
-                        self.settings.ctrl.lines[this.value].visible = this.checked;
-                        self.renderControl();
-                        self.renderMain(
-                            Math.floor(naviLmaskWidth / self.settings.ctrl.xMult),
-                            Math.floor(naviRmaskWidth / self.settings.ctrl.xMult)
+                        this.settings.ctrl.lines[checkbox.value].visible = checkbox.checked;
+                        this.renderControl();
+                        this.renderMain(
+                            Math.floor(naviLmaskWidth / this.settings.ctrl.xMult),
+                            Math.floor(naviRmaskWidth / this.settings.ctrl.xMult)
                         );
                     });
                     label.appendChild(input);
                     label.appendChild(fakeCheckbox);
                     label.appendChild(text);
                     buttons.appendChild(label);
-                    self.settings.ctrl.lines[ item[0] ] = {
+                    this.settings.ctrl.lines[ item[0] ] = {
                         color: options.data['colors'][ item[0] ],
                         visible: true
                     }
@@ -171,10 +174,22 @@ class KeiChart {
             window.addEventListener('mousemove', lCtrlMove);
         });
 
+        naviLctrl.addEventListener('touchstart', (e) => {
+            pageX = e.touches[0].pageX;
+            e.preventDefault();
+            window.addEventListener('touchmove', lCtrlMove);
+        });
+
         naviRctrl.addEventListener('mousedown', (e) => {
             pageX = e.pageX;
             e.preventDefault();
             window.addEventListener('mousemove', rCtrlMove);
+        });
+
+        naviRctrl.addEventListener('touchstart', (e) => {
+            pageX = e.touches[0].pageX;
+            e.preventDefault();
+            window.addEventListener('touchmove', rCtrlMove);
         });
 
         naviWin.addEventListener('mousedown', (e) => {
@@ -183,7 +198,15 @@ class KeiChart {
             window.addEventListener('mousemove', winMove);
         });
 
+        naviWin.addEventListener('touchstart', (e) => {
+            pageX = e.touches[0].pageX;
+            e.preventDefault();
+            window.addEventListener('touchmove', winMove);
+        });
+
         window.addEventListener('mouseup', ctrlStop);
+
+        window.addEventListener('touchend', ctrlStop);
 
         window.addEventListener('resize', (e) => {
             this.settings.width = Math.max(this.settings.minWidth, this.settings.container.clientWidth);
@@ -336,6 +359,29 @@ class KeiChart {
 
     static convertY (y, y0) { return y0 - y; }
 }
+
+KeiChartNew = function (options) {
+    let cfg = {
+        container: options.container || document.body,
+        height: 0,
+        width: 0,
+        minWidth: 320,
+        gData: null,
+        main: {
+            lineWidth: 2
+        },
+        ctrl: {
+            height: 100,
+            lineWidth: 1,
+            winWidth: 140,
+            lines: []
+        }
+    };
+    let elem = document.createElement('div');
+
+    cfg.width = options.width || Math.max(cfg.minWidth, cfg.container.clientWidth);
+    cfg.height = cfg.height = options.height || (cfg.width * 0.75);
+};
 
 function loadJSON(filename, callback) {
     let xobj = new XMLHttpRequest();
