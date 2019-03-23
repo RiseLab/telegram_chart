@@ -398,7 +398,7 @@ function loadJSON(filename, callback) {
 document.addEventListener('DOMContentLoaded', function () {
     loadJSON('graphs.json', function (response) {
         let graphsData = JSON.parse(response);
-        for (let i = 0; i <= 0; i++) {
+        for (let i = 0; i <= 4; i++) {
             let chart = new KeiChart({
                 data: graphsData[i],
                 container: document.getElementsByClassName('charts-view__chart')[i]
